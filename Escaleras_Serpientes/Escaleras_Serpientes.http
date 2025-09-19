@@ -1,0 +1,6 @@
+@Escaleras_Serpientes_HostAddress = http://localhost:5089
+
+GET {{Escaleras_Serpientes_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

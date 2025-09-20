@@ -76,17 +76,17 @@ namespace Escaleras_Serpientes.Services.Room
             return room;
         }
 
-        public Entities.Room JoinRoom(code id)
-        {
-            Entities.Room? room = _dbContext.Rooms
-                .Include(x => x.Players)
-                .FirstOrDefault(r => r.Id == id);
+        //public Entities.Room JoinRoom(code id)
+        //{
+        //    Entities.Room? room = _dbContext.Rooms
+        //        .Include(x => x.Players)
+        //        .FirstOrDefault(r => r.Id == id);
 
-            if (room == null)
-            {
-                throw new Exception("Player not found");
-            }
-            return room;
-        }
+        //    if (room == null)
+        //    {
+        //        throw new Exception("Player not found");
+        //    }
+        //    return room;
+        //}
     }
 }

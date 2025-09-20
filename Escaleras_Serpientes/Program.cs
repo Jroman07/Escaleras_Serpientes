@@ -1,3 +1,5 @@
+using Escaleras_Serpientes.Hubs;
+using Escaleras_Serpientes.Services.Auth;
 using Escaleras_Serpientes.Services.Player;
 using Escaleras_Serpientes.Services.Room;
 using Escaleras_Serpientes.SnakesLaddersDataBase;
@@ -8,11 +10,13 @@ using System.Text;
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSignalR();
 
 // Add services to the container.
 builder.Services.AddScoped<SnakesLaddersDbContext>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(x =>
@@ -51,6 +55,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseRouting();
+
+app.UseCors(x => x
+   .AllowAnyMethod()
+   .AllowAnyHeader()
+   .SetIsOriginAllowed(origin => true) // For development only  
+   .AllowCredentials());
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -61,10 +75,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<GameHub>("/gameHub");
+});
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 

@@ -8,7 +8,7 @@ namespace Escaleras_Serpientes.Services.Player
         public List<Entities.Player> GetAllPlayers();
         public List<WinsPlayerDto> GetRankigPlayers();
         public Entities.Player GetPlayerById(int id);
-        public Entities.Player CreatePlayer(CreatePlayerDto dto);
+        public Payload CreatePlayer(CreatePlayerDto dto);
         public Entities.Player AddWin(int id);
         public Entities.Room JoinRoom(int code);
         public void DeletePlayer(int id);

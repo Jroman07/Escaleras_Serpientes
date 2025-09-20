@@ -8,16 +8,13 @@ namespace Escaleras_Serpientes.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private readonly PlayerService _playerService;
-        public AuthService(PlayerService playerService)
+        public string GenerateJwtToken(int Id, string name)
         {
-            _playerService = playerService;
-        }
-        private string GenerateJwtToken(int Id, string role)
-        {
+            string role = "PLAYER"; // Default role
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Name, name),
                 new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
@@ -29,32 +26,10 @@ namespace Escaleras_Serpientes.Services.Auth
                 issuer: "yourdomain.com",
                 audience: "yourdomain.com",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(120),
+                expires: DateTime.Now.AddHours(4),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public string Authenticate(int playerID)
-        {
-            if (playerID != 0)
-            {
-                Entities.Player? foundPlayer = _playerService.GetPlayerById(playerID);
-
-                if (foundPlayer != null)
-                {
-                    var token = GenerateJwtToken(foundPlayer.Id, "Player");
-
-                    return token;
-                }
-                else
-                {
-                    return null;
-                }
-
-            }
-            return null;
-
         }
     }
 }

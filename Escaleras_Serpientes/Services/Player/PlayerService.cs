@@ -1,6 +1,5 @@
-﻿
-using Escaleras_Serpientes.Dtos.Player;
-using Escaleras_Serpientes.Services.Room;
+﻿using Escaleras_Serpientes.Dtos.Player;
+using Escaleras_Serpientes.Services.Auth;
 using Escaleras_Serpientes.SnakesLaddersDataBase;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,11 +8,12 @@ namespace Escaleras_Serpientes.Services.Player
     public class PlayerService : IPlayerService
     {
         private readonly SnakesLaddersDbContext _dbContext;
-        private readonly RoomService _roomService;
-        public PlayerService(SnakesLaddersDbContext dbContext, RoomService roomService)
+        private readonly IAuthService _authService;
+
+        public PlayerService(SnakesLaddersDbContext dbContext, IAuthService authService)
         {
-            _roomService = roomService;
             _dbContext = dbContext;
+            _authService = authService;
         }
 
         public Entities.Player AddWin(int id)
@@ -25,7 +25,7 @@ namespace Escaleras_Serpientes.Services.Player
             return player;
         }
 
-        public Entities.Player CreatePlayer(CreatePlayerDto dto)
+        public Payload CreatePlayer(CreatePlayerDto dto)
         {
             if (dto == null)
             {
@@ -44,7 +44,11 @@ namespace Escaleras_Serpientes.Services.Player
                     _dbContext.Players.Add(player);
                     _dbContext.SaveChanges();
 
-                    return player;
+                    var playerToken = _authService.GenerateJwtToken(player.Id, player.Name);
+
+                    Payload payload = new Payload {token = playerToken, Player = player };
+
+                    return payload;
                 }
 
             }

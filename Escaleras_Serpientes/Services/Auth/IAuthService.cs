@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        public string Authenticate(int playerID);
+        public string GenerateJwtToken(int Id, string name);
     }
 }

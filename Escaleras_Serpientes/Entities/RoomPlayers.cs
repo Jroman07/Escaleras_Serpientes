@@ -17,5 +17,9 @@ namespace Escaleras_Serpientes.Entities
         [JsonIgnore]
         public Room Room { get; set; } = null; 
 
+        public int TurnOrder {  get; set; }
+
+        public int Postion {  get; set; }
+
     }
 }

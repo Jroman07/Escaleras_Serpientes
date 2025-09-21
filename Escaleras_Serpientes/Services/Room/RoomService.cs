@@ -1,4 +1,5 @@
 ﻿using Escaleras_Serpientes.Dtos.Room;
+using Escaleras_Serpientes.Entities;
 using Escaleras_Serpientes.Services.Player;
 using Escaleras_Serpientes.SnakesLaddersDataBase;
 using Microsoft.EntityFrameworkCore;
@@ -63,13 +64,26 @@ namespace Escaleras_Serpientes.Services.Room
 
         public List<Entities.Room> GetAllRooms()
         {
-            return _dbContext.Rooms.Include(x => x.Players).ToList();
+            return _dbContext.Rooms.Include(x => x.RoomPlayers).ToList();
+        }
+
+        public Entities.Room GetRoomByCode(int code)
+        {
+            Entities.Room? room = _dbContext.Rooms
+                .Include(x => x.RoomPlayers)
+                .FirstOrDefault(r => r.Code == code);
+
+            if (room == null)
+            {
+                throw new Exception("Player not found");
+            }
+            return room;
         }
 
         public Entities.Room GetRoomById(int id)
         {
             Entities.Room? room = _dbContext.Rooms
-                .Include(x => x.Players)
+                .Include(x => x.RoomPlayers)
                 .FirstOrDefault(r => r.Id == id);
 
             if (room == null)
@@ -83,8 +97,33 @@ namespace Escaleras_Serpientes.Services.Room
         {
             var room = await _dbContext.Rooms
             .Include(r => r.RoomPlayers)
-            .SingleOrDefaultAsync(r => r.Code == codeRoom,ct) 
+            .SingleOrDefaultAsync(r => r.Code == codeRoom, ct)
             ?? throw new KeyNotFoundException("Sala no encontrada.");
+
+            if (room.IsStarted)
+                throw new InvalidOperationException("La sala está cerrada.");
+
+            // Buscar el jugador por UserId (mapeado del JWT)
+            var player = await _dbContext.Players.SingleOrDefaultAsync(p => p.Id == playerID, ct)
+                         ?? throw new InvalidOperationException("Jugador no existe para este usuario.");
+
+            // Ya está dentro
+            var alreadyIn = room.RoomPlayers.Any(rp => rp.PlayerId == player.Id);
+            if (!alreadyIn)
+            {
+                // Capacidad
+                if (room.RoomPlayers.Count >= room.MaxPlayers)
+                    throw new InvalidOperationException("La sala está llena.");
+
+                _dbContext.RoomPlayers.Add(new RoomPlayers
+                {
+                    RoomId = room.Id,
+                    PlayerId = player.Id
+                });
+
+                await _dbContext.SaveChangesAsync(ct);
+            }
+
             return room;
         }
 

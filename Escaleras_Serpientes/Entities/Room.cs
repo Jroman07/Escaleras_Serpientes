@@ -9,10 +9,10 @@ namespace Escaleras_Serpientes.Entities
         public string Name { get; set; }
         public int Code { get; set; }
         public int MinPlayers { get; set; }
-        public int MaxPlayers { get; set; }
-        public bool IsStarted { get; set; }
-        [JsonIgnore]
-        public List<Player> Players { get; set; }
+        public int MaxPlayers { get; set; } = 4; 
+        public bool IsStarted { get; set; } = false;
+
+        public int CurrentTurnOrder { get; set; } = 0;
         [JsonIgnore]
         public Resume? Resume { get; set; }
         [JsonIgnore]

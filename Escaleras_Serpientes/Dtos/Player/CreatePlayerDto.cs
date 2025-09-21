@@ -18,7 +18,6 @@ namespace Escaleras_Serpientes.Dtos.Player
                 Wins = 0,        // valores por defecto
                 TurnOrder = null,
                 Position = null,
-                RoomId = null
             };
     }
 }

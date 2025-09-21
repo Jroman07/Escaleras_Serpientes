@@ -52,11 +52,11 @@ namespace Escaleras_Serpientes.Controllers
                 User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
                 User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
-            if (string.IsNullOrWhiteSpace(idClaim) || !int.TryParse(idClaim, out var userId))
+            if (string.IsNullOrWhiteSpace(idClaim) || !int.TryParse(idClaim, out var playerId))
                 return Unauthorized("No fue posible identificar al usuario (claim id/sub ausente).");
 
-            var me = await _playerService.FindMeAsync(userId, ct);
-            if (me is null) return NotFound($"Usuario con ID {userId} no encontrado.");
+            var me = await _playerService.FindMeAsync(playerId, ct);
+            if (me is null) return NotFound($"Usuario con ID {playerId} no encontrado.");
 
             return Ok(me);
         }
@@ -70,7 +70,7 @@ namespace Escaleras_Serpientes.Controllers
             {
                 return Conflict("Player with the same name already exists or invalid data.");
             }
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", "New Player", createdPlayer.Player.Name, "Wins Number", createdPlayer.Player.Wins);
+            //await _hubContext.Clients.All.SendAsync("ReceiveMessage", "New Player", createdPlayer.Player.Name, "Wins Number", createdPlayer.Player.Wins);
             return Ok(createdPlayer);
         }
 

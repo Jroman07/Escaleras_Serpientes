@@ -4,6 +4,7 @@
     {
         public List<Entities.Room> GetAllRooms();
         public Entities.Room GetRoomById(int id);
+        public Entities.Room GetRoomByCode(int code);
         public Entities.Room CreateRoom(Dtos.Room.CreateRoomDto dto);
         public Task<Entities.Room> JoinRoom(int codeRoom, int playerID, CancellationToken ct);
         public void DeleteRoom(int id);

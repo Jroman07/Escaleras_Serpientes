@@ -15,5 +15,7 @@ namespace Escaleras_Serpientes.Entities
         public List<Player> Players { get; set; }
         [JsonIgnore]
         public Resume? Resume { get; set; }
+        [JsonIgnore]
+        public List<RoomPlayers>? RoomPlayers { get; set; }
     }
 }

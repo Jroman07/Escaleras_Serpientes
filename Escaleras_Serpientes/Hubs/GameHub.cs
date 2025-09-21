@@ -8,5 +8,16 @@ namespace Escaleras_Serpientes.Hubs
         {
             await Clients.All.SendAsync("ReceiveMessage", user, message, wins, winsNumber);
         }
+
+        public async Task SendChatMessage(string sala, string user, string message)
+        {
+            await Clients.Group(sala).SendAsync("ReceiveChatMessage", user, message);
+        }
+
+        public async Task UpdateRanking()
+        {
+            await Clients.All.SendAsync("ReceiveChatMessage");
+        }
     }
 }
+

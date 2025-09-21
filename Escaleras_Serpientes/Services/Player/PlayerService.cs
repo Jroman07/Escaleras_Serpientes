@@ -69,6 +69,14 @@ namespace Escaleras_Serpientes.Services.Player
             }
         }
 
+        public async Task<Entities.Player> FindMeAsync(int id, CancellationToken ct = default)
+        {
+            var player = await _dbContext.Players
+                .SingleOrDefaultAsync(p => p.Id == id, ct);
+
+            return player ?? throw new KeyNotFoundException("Player not found");
+        }
+
         public List<Entities.Player> GetAllPlayers()
         {
             return _dbContext.Players.ToList();
@@ -96,11 +104,6 @@ namespace Escaleras_Serpientes.Services.Player
             .Select(p => new WinsPlayerDto { Name = p.Name, Wins = p.Wins });
 
             return query.ToList();
-        }
-
-        public Entities.Room JoinRoom(int code)
-        {
-            throw new NotImplementedException();
         }
     }
 }

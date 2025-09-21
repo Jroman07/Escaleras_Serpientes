@@ -1,4 +1,5 @@
 ﻿using Escaleras_Serpientes.Dtos.Room;
+using Escaleras_Serpientes.Services.Player;
 using Escaleras_Serpientes.SnakesLaddersDataBase;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +8,11 @@ namespace Escaleras_Serpientes.Services.Room
     public class RoomService : IRoomService
     {
         private readonly SnakesLaddersDbContext _dbContext;
-        public RoomService(SnakesLaddersDbContext dbContext)
+        private readonly IPlayerService _playerService;
+        public RoomService(SnakesLaddersDbContext dbContext, IPlayerService playerService)
         {
             _dbContext = dbContext;
+            _playerService = playerService;
         }
 
         public Entities.Room CreateRoom(CreateRoomDto dto)
@@ -73,6 +76,15 @@ namespace Escaleras_Serpientes.Services.Room
             {
                 throw new Exception("Player not found");
             }
+            return room;
+        }
+
+        public async  Task<Entities.Room> JoinRoom(int codeRoom, int playerID, CancellationToken ct = default)
+        {
+            var room = await _dbContext.Rooms
+            .Include(r => r.RoomPlayers)
+            .SingleOrDefaultAsync(r => r.Code == codeRoom,ct) 
+            ?? throw new KeyNotFoundException("Sala no encontrada.");
             return room;
         }
 

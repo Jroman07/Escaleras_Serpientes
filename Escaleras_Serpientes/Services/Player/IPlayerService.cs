@@ -10,7 +10,7 @@ namespace Escaleras_Serpientes.Services.Player
         public Entities.Player GetPlayerById(int id);
         public Payload CreatePlayer(CreatePlayerDto dto);
         public Entities.Player AddWin(int id);
-        public Entities.Room JoinRoom(int code);
+        public Task<Entities.Player> FindMeAsync(int id, CancellationToken ct = default);
         public void DeletePlayer(int id);
 
     }

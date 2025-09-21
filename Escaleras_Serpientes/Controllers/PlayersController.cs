@@ -2,9 +2,11 @@
 using Escaleras_Serpientes.Entities;
 using Escaleras_Serpientes.Hubs;
 using Escaleras_Serpientes.Services.Player;
-using Microsoft.AspNet.SignalR.Messaging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -39,6 +41,24 @@ namespace Escaleras_Serpientes.Controllers
         public Player Get(int id)
         {
             return _playerService.GetPlayerById(id);
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<Player>> GetMe(CancellationToken ct)
+        {
+            // Intenta leer el id del usuario desde NameIdentifier o 'sub'
+            var idClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+
+            if (string.IsNullOrWhiteSpace(idClaim) || !int.TryParse(idClaim, out var userId))
+                return Unauthorized("No fue posible identificar al usuario (claim id/sub ausente).");
+
+            var me = await _playerService.FindMeAsync(userId, ct);
+            if (me is null) return NotFound($"Usuario con ID {userId} no encontrado.");
+
+            return Ok(me);
         }
 
         // POST api/<PlayersController>

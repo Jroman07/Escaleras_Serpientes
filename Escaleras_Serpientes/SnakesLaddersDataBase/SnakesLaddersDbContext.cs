@@ -14,6 +14,7 @@ namespace Escaleras_Serpientes.SnakesLaddersDataBase
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Resume> Resumes { get; set; }
         public DbSet<ResumePlayer> ResumePlayers { get; set; }
+        public DbSet<RoomPlayers> RoomPlayers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,7 +36,7 @@ namespace Escaleras_Serpientes.SnakesLaddersDataBase
                 .WithMany()
                 .HasForeignKey(rp => rp.ResumeId);
 
-            // Player 1 - * ResumePlayer
+            // Player * - * Resume (ResumePlayer)
             modelBuilder.Entity<ResumePlayer>()
                 .HasKey(cs => cs.Id);
 
@@ -53,6 +54,23 @@ namespace Escaleras_Serpientes.SnakesLaddersDataBase
                 .WithMany(r => r.ResumePlayers)
                 .HasForeignKey(rp => rp.ResumeId);
 
+            // Room * - * Player (RoomPlayers)
+            modelBuilder.Entity<RoomPlayers>()
+                .HasKey(cs => cs.Id);
+
+            modelBuilder.Entity<RoomPlayers>()
+                .Property(cs => cs.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<RoomPlayers>()
+                .HasOne(rp => rp.Player)
+                .WithMany(p => p.RoomPlayers)
+                .HasForeignKey(rp => rp.PlayerId);
+
+            modelBuilder.Entity<RoomPlayers>()
+                .HasOne(rp => rp.Room)
+                .WithMany(r => r.RoomPlayers)
+                .HasForeignKey(rp => rp.RoomId);
         }
 
     }

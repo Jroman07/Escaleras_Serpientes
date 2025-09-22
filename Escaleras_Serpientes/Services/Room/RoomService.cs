@@ -64,13 +64,17 @@ namespace Escaleras_Serpientes.Services.Room
 
         public List<Entities.Room> GetAllRooms()
         {
-            return _dbContext.Rooms.Include(x => x.RoomPlayers).ToList();
+            return _dbContext.Rooms
+                .Include(r => r.RoomPlayers)
+                    .ThenInclude(rp => rp.Player)
+                .ToList();
         }
 
         public Entities.Room GetRoomByCode(int code)
         {
             Entities.Room? room = _dbContext.Rooms
                 .Include(x => x.RoomPlayers)
+                .ThenInclude(rp => rp.Player)
                 .FirstOrDefault(r => r.Code == code);
 
             if (room == null)
@@ -84,6 +88,7 @@ namespace Escaleras_Serpientes.Services.Room
         {
             Entities.Room? room = _dbContext.Rooms
                 .Include(x => x.RoomPlayers)
+                .ThenInclude(rp => rp.Player)
                 .FirstOrDefault(r => r.Id == id);
 
             if (room == null)

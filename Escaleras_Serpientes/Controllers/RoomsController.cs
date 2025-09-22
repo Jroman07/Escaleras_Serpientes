@@ -36,6 +36,17 @@ namespace Escaleras_Serpientes.Controllers
             return _roomService.GetRoomById(id);
         }
 
+        [HttpGet("code/{code}")]
+        public ActionResult<Room> GetByCode(int code)
+        {
+            var foundRoom = _roomService.GetRoomByCode(code);
+            if (foundRoom == null)
+            {
+                return Conflict("Sala no encontrada.");
+            }
+            return Ok(foundRoom);
+        }
+
         // POST api/<RoomsController>
         [HttpPost]
         public ActionResult<Room> Post([FromBody] CreateRoomDto dto)

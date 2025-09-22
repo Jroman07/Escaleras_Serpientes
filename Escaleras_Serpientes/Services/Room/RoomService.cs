@@ -75,7 +75,7 @@ namespace Escaleras_Serpientes.Services.Room
 
             if (room == null)
             {
-                throw new Exception("Player not found");
+                return null;
             }
             return room;
         }
@@ -88,7 +88,7 @@ namespace Escaleras_Serpientes.Services.Room
 
             if (room == null)
             {
-                throw new Exception("Player not found");
+                return null;
             }
             return room;
         }

@@ -17,11 +17,10 @@ namespace Escaleras_Serpientes.Controllers
             _resumeService = resumeService;
         }
 
-        // POST api/RoomsGame/init/1234
-
-        [HttpPost("init/{roomCode}")]
+        // POST api/Resume/init/1234
+        [HttpPost("init/{roomCode:int}")]
         [Authorize]
-        public async Task<ActionResult> InitializeGame(int roomCode, CancellationToken ct)
+        public async Task<ActionResult> InitializeGame([FromRoute] int roomCode, CancellationToken ct)
         {
             var userId = GetUserIdFromClaims();
             if (userId is null)
@@ -29,7 +28,8 @@ namespace Escaleras_Serpientes.Controllers
 
             try
             {
-                await _resumeService.RollDiceAsync(roomCode, userId.Value, ct);
+                // Nuevo nombre: InitializeGameAsync
+                await _resumeService.InitializeGameAsync(roomCode, userId.Value, ct);
                 return Ok("Partida inicializada.");
             }
             catch (KeyNotFoundException ex)
@@ -46,9 +46,10 @@ namespace Escaleras_Serpientes.Controllers
             }
         }
 
-        // POST api/RoomsGame/turn/1234
-        [HttpPost("turn/{roomCode}")]
-        public async Task<ActionResult> PlayTurn(int roomCode, CancellationToken ct)
+        // POST api/Resume/turn/1234
+        [HttpPost("turn/{roomCode:int}")]
+        [Authorize]
+        public async Task<ActionResult> PlayTurn([FromRoute] int roomCode, CancellationToken ct)
         {
             var userId = GetUserIdFromClaims();
             if (userId is null)
@@ -56,7 +57,8 @@ namespace Escaleras_Serpientes.Controllers
 
             try
             {
-                await _resumeService.StartGameAsync(roomCode, userId.Value, ct);
+                // Nuevo nombre: PlayTurnAsync
+                await _resumeService.PlayTurnAsync(roomCode, userId.Value, ct);
                 return Ok("Turno procesado.");
             }
             catch (KeyNotFoundException ex)

@@ -2,7 +2,7 @@
 {
     public interface IResumeService
     {
-        Task StartGameAsync(int roomCode, int userId, CancellationToken ct = default);
-        Task RollDiceAsync(int roomCode, int userId, CancellationToken ct = default);
+        Task InitializeGameAsync(int roomCode, int startedByUserId, CancellationToken ct = default);
+        Task PlayTurnAsync(int roomCode, int userId, CancellationToken ct = default);
     }
 }

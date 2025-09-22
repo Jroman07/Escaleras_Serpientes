@@ -28,6 +28,8 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IResumeService, ResumeService>();
+builder.Services.AddSingleton<IGameService, GameService>();
+
 
 builder.Services
     .AddControllers()

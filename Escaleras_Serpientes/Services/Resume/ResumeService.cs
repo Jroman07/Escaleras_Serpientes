@@ -129,8 +129,9 @@ namespace Escaleras_Serpientes.Services.Resume
                 int from = myRP.Position;
                 int tentative = from + dice;
 
-                // Regla simple: si te pasas, no avanzas
-                if (tentative > FinalCell) tentative = from;
+                // Regla: si te pasas, no avanzas
+                bool overshoot = tentative > FinalCell;
+                if (overshoot) tentative = from;
 
                 myRP.Position = tentative;
 
@@ -152,19 +153,20 @@ namespace Escaleras_Serpientes.Services.Resume
 
                 await _dbContext.SaveChangesAsync(ct); // movimiento base
 
-                // Broadcast de tirada
+                // 🔔 Resultado del dado (siempre)
                 await _hub.Clients.Group(room.Name).SendAsync("DiceRolled", new
                 {
                     playerId = me.Id,
+                    playerName = me.Name,
                     dice,
                     from,
-                    to = myRP.Position
+                    to = myRP.Position,
+                    overshoot
                 }, ct);
 
                 // ¿Ganó?
                 if (myRP.Position >= FinalCell)
                 {
-                    // Asegúrate que AddWin persista (o haz que este servicio lo persista)
                     _playerService.AddWin(me.Id);
 
                     await _hub.Clients.Group(room.Name).SendAsync("PlayerWon", new
@@ -184,9 +186,19 @@ namespace Escaleras_Serpientes.Services.Resume
 
                 await _dbContext.SaveChangesAsync(ct);
 
+                // 🔔 Notificar siguiente turno e incluir el último dado
                 await _hub.Clients.Group(room.Name).SendAsync("NextTurn", new
                 {
-                    turnOrder = room.CurrentTurnOrder
+                    turnOrder = room.CurrentTurnOrder,
+                    lastDice = new
+                    {
+                        playerId = me.Id,
+                        playerName = me.Name,
+                        dice,
+                        from,
+                        to = myRP.Position,
+                        overshoot
+                    }
                 }, ct);
             }
             finally
@@ -194,5 +206,6 @@ namespace Escaleras_Serpientes.Services.Resume
                 sem.Release();
             }
         }
+
     }
 }

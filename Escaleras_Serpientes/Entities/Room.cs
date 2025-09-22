@@ -11,10 +11,9 @@ namespace Escaleras_Serpientes.Entities
         public int MinPlayers { get; set; }
         public int MaxPlayers { get; set; } = 4; 
         public bool IsStarted { get; set; } = false;
-
         public int CurrentTurnOrder { get; set; } = 0;
         [JsonIgnore]
-        public Resume? Resume { get; set; }
+        public List<Resume>? resumes { get; set; } = new();
         [JsonIgnore]
         public List<RoomPlayers>? RoomPlayers { get; set; }
     }

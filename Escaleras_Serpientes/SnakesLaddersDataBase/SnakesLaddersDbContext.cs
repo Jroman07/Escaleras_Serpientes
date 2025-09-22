@@ -18,11 +18,11 @@ namespace Escaleras_Serpientes.SnakesLaddersDataBase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Room 1 - 1 Resume (Room is principal)
-            modelBuilder.Entity<Resume>()
-                .HasOne(r => r.Room)
-                .WithOne(room => room.Resume)
-                .HasForeignKey<Resume>(r => r.RoomId);
+            // Room 1 - * Resume (Room is principal)
+            modelBuilder.Entity<Room>()
+                .HasMany(r => r.resumes)
+                .WithOne(res => res.Room)
+                .HasForeignKey(r => r.RoomId);
 
             // Resume 1 - * ResumePlayer
             modelBuilder.Entity<ResumePlayer>()

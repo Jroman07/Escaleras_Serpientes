@@ -8,9 +8,6 @@ namespace Escaleras_Serpientes.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         [JsonIgnore]
-        public int? TurnOrder { get; set; }
-        [JsonIgnore]
-        public int? Position { get; set; }
         public int Wins { get; set; }
         [JsonIgnore]
         public List<ResumePlayer>? ResumePlayers { get; set; }

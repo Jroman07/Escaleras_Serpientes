@@ -1,6 +1,7 @@
 using Escaleras_Serpientes.Hubs;
 using Escaleras_Serpientes.Services.Auth;
 using Escaleras_Serpientes.Services.Player;
+using Escaleras_Serpientes.Services.Resume;
 using Escaleras_Serpientes.Services.Room;
 using Escaleras_Serpientes.SnakesLaddersDataBase;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<SnakesLaddersDbContext>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(x =>

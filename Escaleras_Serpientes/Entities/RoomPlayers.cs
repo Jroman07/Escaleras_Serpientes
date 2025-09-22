@@ -19,7 +19,7 @@ namespace Escaleras_Serpientes.Entities
 
         public int TurnOrder {  get; set; }
 
-        public int Postion {  get; set; }
+        public int Position {  get; set; }
 
     }
 }

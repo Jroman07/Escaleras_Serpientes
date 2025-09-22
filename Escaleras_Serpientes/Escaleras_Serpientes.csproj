@@ -15,4 +15,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Proyecto\Escaleras_Serpientes\Escaleras_Serpientes\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Proyecto\Escaleras_Serpientes\Escaleras_Serpientes\.editorconfig" />
+  </ItemGroup>
+
 </Project>

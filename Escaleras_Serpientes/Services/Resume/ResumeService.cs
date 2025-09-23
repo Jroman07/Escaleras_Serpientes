@@ -76,12 +76,13 @@ namespace Escaleras_Serpientes.Services.Resume
                 await _dbContext.SaveChangesAsync(ct);
 
                 // Aviso de inicio a la sala (grupo = room.Name)
-                await _hub.Clients.Group(room.Name).SendAsync("GameStarted", new
+                var group = room.Code.ToString();
+
+                await _hub.Clients.Group(group).SendAsync("GameStarted", new
                 {
                     roomCode = room.Code,
                     roomName = room.Name,
-                    Players = room.RoomPlayers.Select(rp => new
-                    {
+                    Players = room.RoomPlayers.Select(rp => new {
                         rp.PlayerId,
                         rp.Player.Name,
                         rp.TurnOrder,
@@ -207,6 +208,41 @@ namespace Escaleras_Serpientes.Services.Resume
             {
                 sem.Release();
             }
+        }
+
+        public async Task<GameSnapshotDto> GetSnapshotAsync(string groupId, CancellationToken ct = default)
+        {
+            // groupId es el nombre del grupo que usas en SignalR. 
+            // En tu servicio envías a Clients.Group(room.Name), así que aquí buscamos por Name.
+            // Si quieres soportar código, puedes intentar parsear a int y buscar por Code.
+            var room = await _dbContext.Rooms
+                .Include(r => r.RoomPlayers)
+                    .ThenInclude(rp => rp.Player)
+                .SingleOrDefaultAsync(r => r.Name == groupId, ct);
+
+            if (room is null)
+                throw new KeyNotFoundException("Sala no encontrada para el snapshot.");
+
+            var players = room.RoomPlayers
+                .OrderBy(rp => rp.TurnOrder)
+                .Select(rp => new PlayerSnapDto(
+                    rp.PlayerId,
+                    rp.Player.Name,
+                    rp.TurnOrder,
+                    rp.Position
+                ))
+                .ToList();
+
+            // Reusa tu diccionario de saltos del servicio
+            var jumps = new Dictionary<int, int>(_jumps);
+
+            return new GameSnapshotDto(
+                RoomCode: room.Code,
+                RoomName: room.Name,
+                CurrentTurnOrder: room.CurrentTurnOrder,
+                Players: players,
+                Jumps: jumps
+            );
         }
 
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Escaleras_Serpientes.Entities;
+using Escaleras_Serpientes.Services.Resume;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace Escaleras_Serpientes.Hubs
@@ -8,6 +10,14 @@ namespace Escaleras_Serpientes.Hubs
     public sealed record GameStateDto(string RoomId, object State, string CurrentTurnPlayer);
     public sealed record GameResultDto(string RoomId, object Results);
     public sealed record RankingEntryDto(string PlayerName, int Wins);
+    public sealed record PlayerSnapDto(int PlayerId, string Name, int TurnOrder, int Position);
+    public sealed record GameSnapshotDto(
+        int RoomCode,
+        string RoomName,
+        int CurrentTurnOrder,
+        IReadOnlyList<PlayerSnapDto> Players,
+        IReadOnlyDictionary<int, int> Jumps
+    );
 
     public interface IGameService
     {
@@ -21,11 +31,13 @@ namespace Escaleras_Serpientes.Hubs
     {
         private readonly ConnectionRegistryGame _registry;  // <-- usa tu ConnectionRegistry
         private readonly IGameService _game;
+        private readonly IResumeService _resume;   // <── nuevo
 
-        public GameHub(ConnectionRegistryGame registry, IGameService game)
+        public GameHub(ConnectionRegistryGame registry, IGameService game, IResumeService resume)
         {
             _registry = registry;
             _game = game;
+            _resume = resume;
         }
 
         // Utilidad: nombre amigable desde claims si no viene explícito
@@ -35,6 +47,26 @@ namespace Escaleras_Serpientes.Hubs
             var nameClaim = Context.User?.FindFirst(ClaimTypes.Name)?.Value
                             ?? Context.User?.Identity?.Name;
             return string.IsNullOrWhiteSpace(nameClaim) ? Context.ConnectionId : nameClaim!;
+        }
+
+        // Llamado desde el tablero tras navegar
+        public async Task SubscribeGame(string groupId, string playerName)
+        {
+            if (string.IsNullOrWhiteSpace(groupId))
+                throw new HubException("groupId requerido");
+
+            var who = string.IsNullOrWhiteSpace(playerName)
+                ? (Context.User?.Identity?.Name ?? Context.ConnectionId)
+                : playerName;
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
+            _registry.Set(Context.ConnectionId, groupId, who);
+
+            // tomar el estado actual de la partida
+            var snap = await _resume.GetSnapshotAsync(groupId);
+
+            // enviar snapshot SOLO al caller (para hidratar el tablero)
+            await Clients.Caller.SendAsync("GameSnapshot", snap);
         }
 
         public async Task JoinRoom(string roomId, string playerName)

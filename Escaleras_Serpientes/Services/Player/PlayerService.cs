@@ -29,29 +29,30 @@ namespace Escaleras_Serpientes.Services.Player
         {
             if (dto == null)
             {
-                throw new Exception("Object is empty");
+                throw new ArgumentNullException(nameof(dto), "El objeto DTO no puede ser nulo.");
             }
-            else
+
+            // Verificar duplicados
+            var existing = _dbContext.Players
+                .FirstOrDefault(x => x.Name == dto.Name);
+
+            if (existing != null)
             {
-                Entities.Player? Data = _dbContext.Players.Where(x => x.Name == dto.Name).FirstOrDefault();
-                if (Data != null)
-                {
-                    return null;
-                }
-                else
-                {
-                    var player = dto.ToEntity();
-                    _dbContext.Players.Add(player);
-                    _dbContext.SaveChanges();
-
-                    var playerToken = _authService.GenerateJwtToken(player.Id, player.Name);
-
-                    Payload payload = new Payload {token = playerToken, Player = player };
-
-                    return payload;
-                }
-
+                throw new InvalidOperationException($"El nombre '{dto.Name}' ya está en uso. Elige otro.");
             }
+
+            // Crear el nuevo jugador
+            var player = dto.ToEntity();
+            _dbContext.Players.Add(player);
+            _dbContext.SaveChanges();
+
+            var playerToken = _authService.GenerateJwtToken(player.Id, player.Name);
+
+            return new Payload
+            {
+                token = playerToken,
+                Player = player
+            };
         }
 
         public void DeletePlayer(int Id)

@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://26.249.132.191:30005",
+      "applicationUrl": "http://26.9.80.46:30005",
       "sslPort": 44370
     }
   },
@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://26.249.132.191:5089",
+      "applicationUrl": "http://26.9.80.46:5089",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -24,7 +24,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://26.249.132.191:7033;http://26.249.132.191:5089",
+      "applicationUrl": "https://26.9.80.46:7033;http://26.9.80.46:5089",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

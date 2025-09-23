@@ -97,6 +97,26 @@ namespace Escaleras_Serpientes.Services.Room
             }
             return room;
         }
+        public async Task<Entities.Room> DeletePlayerFromRoomAsync(int codeRoom, int playerId, CancellationToken ct = default)
+        {
+            // Buscar la sala con sus jugadores
+            var room = await _dbContext.Rooms
+                .Include(r => r.RoomPlayers)
+                .ThenInclude(rp => rp.Player)
+                .SingleOrDefaultAsync(r => r.Code == codeRoom, ct)
+                ?? throw new KeyNotFoundException("Sala no encontrada.");
+
+            // Buscar si el jugador está en esa sala
+            var roomPlayer = room.RoomPlayers.SingleOrDefault(rp => rp.PlayerId == playerId);
+            if (roomPlayer == null)
+                throw new InvalidOperationException("El jugador no pertenece a esta sala.");
+
+            // Eliminarlo
+            _dbContext.RoomPlayers.Remove(roomPlayer);
+            await _dbContext.SaveChangesAsync(ct);
+
+            return room;
+        }
 
         public async  Task<Entities.Room> JoinRoom(int codeRoom, int playerID, CancellationToken ct = default)
         {

@@ -106,5 +106,49 @@ namespace Escaleras_Serpientes.Controllers
         {
             _roomService.DeleteRoom(id);
         }
+        // DELETE api/<RoomsController>/5
+        [HttpDelete("{codeRoom:int}/players/{playerId:int}")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemovePlayer(int codeRoom, int playerId, CancellationToken ct)
+        {
+            try
+            {
+                var room = await _roomService.DeletePlayerFromRoomAsync(codeRoom, playerId, ct);
+
+                // Puedes mapear a un DTO si no quieres devolver la entidad completa
+                return Ok(new
+                {
+                    message = "Jugador eliminado de la sala correctamente.",
+                    room = new
+                    {
+                        room.Id,
+                        room.Name,
+                        room.Code,
+                        room.MaxPlayers,
+                        Players = room.RoomPlayers.Select(rp => new
+                        {
+                            rp.PlayerId,
+                            rp.Player!.Name
+                        })
+                    }
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Por ejemplo: "El jugador no pertenece a esta sala"
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor." });
+            }
+        }
     }
 }

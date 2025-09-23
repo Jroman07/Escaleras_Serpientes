@@ -66,14 +66,6 @@ namespace Escaleras_Serpientes.SnakesLaddersDataBase
                 .WithMany(r => r.RoomPlayers)
                 .HasForeignKey(rp => rp.RoomId);
 
-            /// Define al nombre como único
-            modelBuilder.Entity<Player>()
-             .Property(p => p.Name)
-             .IsRequired()
-             .HasMaxLength(50);
-                modelBuilder.Entity<Player>()
-                 .HasIndex(p => p.Name)
-                 .IsUnique();
         }
 
     }

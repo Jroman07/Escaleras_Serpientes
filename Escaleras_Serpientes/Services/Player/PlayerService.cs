@@ -32,16 +32,23 @@ namespace Escaleras_Serpientes.Services.Player
                 throw new ArgumentNullException(nameof(dto), "El objeto DTO no puede ser nulo.");
             }
 
-            // Verificar duplicados
+            // Busca exactamente el mismo nombre (case-sensitive)
             var existing = _dbContext.Players
                 .FirstOrDefault(x => x.Name == dto.Name);
 
             if (existing != null)
             {
-                throw new InvalidOperationException($"El nombre '{dto.Name}' ya está en uso. Elige otro.");
+                // Si ya existe, devuelve ese jugador con un nuevo token
+                var token = _authService.GenerateJwtToken(existing.Id, existing.Name);
+
+                return new Payload
+                {
+                    token = token,
+                    Player = existing
+                };
             }
 
-            // Crear el nuevo jugador
+            // Si no existe, lo crea
             var player = dto.ToEntity();
             _dbContext.Players.Add(player);
             _dbContext.SaveChanges();
@@ -54,6 +61,8 @@ namespace Escaleras_Serpientes.Services.Player
                 Player = player
             };
         }
+
+
 
         public void DeletePlayer(int Id)
         {

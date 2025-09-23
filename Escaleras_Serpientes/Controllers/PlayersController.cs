@@ -75,6 +75,7 @@ namespace Escaleras_Serpientes.Controllers
         }
 
         [HttpPost("signalR")]
+
         public async Task Post([FromBody] string message)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", "PLAYER", message);

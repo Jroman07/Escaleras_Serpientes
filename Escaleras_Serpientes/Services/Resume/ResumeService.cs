@@ -78,6 +78,8 @@ namespace Escaleras_Serpientes.Services.Resume
                 // Aviso de inicio a la sala (grupo = room.Name)
                 await _hub.Clients.Group(room.Name).SendAsync("GameStarted", new
                 {
+                    roomCode = room.Code,
+                    roomName = room.Name,
                     Players = room.RoomPlayers.Select(rp => new
                     {
                         rp.PlayerId,

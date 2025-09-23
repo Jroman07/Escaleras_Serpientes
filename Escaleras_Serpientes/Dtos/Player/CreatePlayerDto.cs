@@ -16,8 +16,7 @@ namespace Escaleras_Serpientes.Dtos.Player
             {
                 Name = dto.Name,
                 Wins = 0,        // valores por defecto
-                TurnOrder = null,
-                Position = null,
+
             };
     }
 }
